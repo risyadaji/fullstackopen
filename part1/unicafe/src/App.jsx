@@ -4,7 +4,10 @@ const Header = ({ title }) => {
   return <h1>{title}</h1>;
 };
 
-const Statistic = ({ good, neutral, bad, all, total }) => {
+const Statistic = ({ good, neutral, bad }) => {
+  let all = good + neutral + bad;
+  let total = good - bad;
+
   if (all === 0) {
     return <p>No feedback given</p>;
   }
@@ -41,25 +44,10 @@ const App = () => {
   const [good, setGood] = useState(0);
   const [neutral, setNeutral] = useState(0);
   const [bad, setBad] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [all, setAll] = useState(0);
 
-  const onClickGood = () => {
-    setGood(good + 1);
-    setAll(all + 1);
-    setTotal(total + 1);
-  };
-
-  const onClickNeutral = () => {
-    setNeutral(neutral + 1);
-    setAll(all + 1);
-  };
-
-  const onClickBad = () => {
-    setBad(bad + 1);
-    setAll(all + 1);
-    setTotal(total - 1);
-  };
+  const onClickGood = () => setGood(good + 1);
+  const onClickNeutral = () => setNeutral(neutral + 1);
+  const onClickBad = () => setBad(bad + 1);
 
   return (
     <div>
@@ -68,13 +56,7 @@ const App = () => {
       <Button text="neutral" onClick={onClickNeutral} />
       <Button text="bad" onClick={onClickBad} />
       <Header title="statistic" />
-      <Statistic
-        total={total}
-        good={good}
-        neutral={neutral}
-        bad={bad}
-        all={all}
-      />
+      <Statistic good={good} neutral={neutral} bad={bad} />
     </div>
   );
 };
