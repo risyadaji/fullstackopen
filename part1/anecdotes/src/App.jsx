@@ -2,6 +2,14 @@ import { useState } from "react";
 
 const Header = ({ title }) => <h1>{title}</h1>;
 const Button = ({ text, onClick }) => <button onClick={onClick}>{text}</button>;
+const Anecdote = ({ text, votes }) => {
+  return (
+    <>
+      <div>{text}</div>
+      <div>has {votes} votes</div>
+    </>
+  );
+};
 
 const randomNumber = (max) => Math.floor(Math.random() * max);
 
@@ -38,14 +46,12 @@ const App = () => {
   return (
     <>
       <Header title="Anecdote of the day" />
-      <div>{anecdotes[selected]}</div>
-      <div>has {votes[selected]} votes</div>
+      <Anecdote text={anecdotes[selected]} votes={votes[selected]} />
       <Button text="vote" onClick={onVoteClick} />
       <Button text="next anecdote" onClick={onNextClick} />
 
       <Header title="Anecdote with most votes" />
-      <div>{anecdotes[maxVoteIndex]}</div>
-      <div>has {votes[maxVoteIndex]} votes</div>
+      <Anecdote text={anecdotes[maxVoteIndex]} votes={votes[maxVoteIndex]} />
     </>
   );
 };
