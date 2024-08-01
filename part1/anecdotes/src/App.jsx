@@ -11,8 +11,6 @@ const Anecdote = ({ text, votes }) => {
   );
 };
 
-const randomNumber = (max) => Math.floor(Math.random() * max);
-
 const App = () => {
   const anecdotes = [
     "If it hurts, do it more often.",
@@ -26,12 +24,20 @@ const App = () => {
   ];
 
   const totalAnecdotes = anecdotes.length;
+  const randomNumber = (max) => Math.floor(Math.random() * max);
 
-  const [votes, setVotes] = useState(Array(totalAnecdotes).fill(0));
+  const [votes, setVotes] = useState(anecdotes.map(() => 0));
   const [selected, setSelected] = useState(randomNumber(totalAnecdotes));
   const [maxVoteIndex, setMaxVoteIndex] = useState(0);
 
-  const onNextClick = () => setSelected(randomNumber(totalAnecdotes));
+  const onNextClick = () => {
+    let nextSelected = randomNumber(totalAnecdotes);
+    while (selected === nextSelected) {
+      nextSelected = randomNumber(totalAnecdotes);
+    }
+    setSelected(nextSelected);
+  };
+
   const onVoteClick = () => {
     const newVote = [...votes]; // avoid mutate array
     newVote[selected]++;
