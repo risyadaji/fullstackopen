@@ -1,21 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+
 import Persons from "./components/Person";
 import PersonForm from "./components/Forms";
 import Filter from "./components/Filter";
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", number: "040-123456", id: 1 },
-    { name: "Ada Lovelace", number: "39-44-5323523", id: 2 },
-    { name: "Dan Abramov", number: "12-43-234345", id: 3 },
-    { name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
-  ]);
-  const [existingPerson, setExistingPerson] = useState(
-    persons.reduce((obj, item) => {
-      obj[item.name] = true;
-      return obj;
-    }, {}),
-  );
+  const [persons, setPersons] = useState([]);
+  const [existingPerson, setExistingPerson] = useState();
+
+  const hookPersons = () => {
+    axios.get("http://localhost:3001/persons").then((resp) => {
+      let persons = resp.data;
+      let existingPersons = persons.reduce((obj, item) => {
+        obj[item.name] = true;
+        return obj;
+      }, {});
+
+      setExistingPerson(existingPersons);
+      setPersons(persons);
+    });
+  };
+
+  useEffect(hookPersons, []);
 
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
@@ -45,7 +52,7 @@ const App = () => {
       return alert("number must not be empty");
     }
 
-    if (existingPerson.hasOwnProperty(newName)) {
+    if (Object.prototype.hasOwnProperty.call(existingPerson, newName)) {
       alert(`${newName} is already added to phonebook`);
       setNewNumber("");
       return setNewName("");
