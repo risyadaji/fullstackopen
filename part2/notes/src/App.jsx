@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+
+import noteService from "./services/notes";
 
 import Note from "./components/Note";
 
@@ -8,15 +9,28 @@ const App = () => {
   const [newNote, setNewNote] = useState("a new note...");
   const [showAll, setShowAll] = useState(true);
 
-  const hookNotes = () => {
-    // only run after all components rendered
-    console.log("effect");
-    axios.get("http://localhost:3001/notes").then((response) => {
-      setNotes(response.data); // will cause a re-rendering
-    });
-  };
+  useEffect(() => {
+    // Only run after all components rendered
+    // SetNotes will cause a re-rendering
+    noteService.getAll().then((notes) => setNotes(notes));
+  }, []);
 
-  useEffect(hookNotes, []);
+  const toggleImportanceOf = (id) => {
+    const note = notes.find((n) => n.id === id);
+    const changeNote = { ...note, important: !note.important };
+
+    noteService
+      .update(id, changeNote)
+      .then((updatedNote) => {
+        // Avoid direct changes + with .map we will get all new array
+        // including updated one
+        setNotes(notes.map((n) => (n.id !== id ? n : updatedNote)));
+      })
+      .catch(() => {
+        alert(`the note '${note.content}' was already deleted from server`);
+        setNotes(notes.filter((n) => n.id !== id));
+      });
+  };
 
   const addNote = (event) => {
     event.preventDefault();
@@ -28,8 +42,10 @@ const App = () => {
         content: newNote,
       };
 
-      setNotes(notes.concat(noteObject));
-      setNewNote("");
+      noteService.create(noteObject).then((newNote) => {
+        setNotes(notes.concat(newNote));
+        setNewNote("");
+      });
     }
   };
 
@@ -45,7 +61,11 @@ const App = () => {
       </div>
       <ul>
         {notesToShow.map((note) => (
-          <Note key={note.id} note={note} />
+          <Note
+            key={note.id}
+            note={note}
+            toggleImportance={() => toggleImportanceOf(note.id)}
+          />
         ))}
       </ul>
       <form onSubmit={addNote}>
