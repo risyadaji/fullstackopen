@@ -16,7 +16,7 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    // this will always trigger after changes on persons
+    // this will always trigger after changes on "persons"
     setExistingPerson(
       persons.reduce((obj, item) => {
         obj[item.name] = item.id
@@ -50,7 +50,7 @@ const App = () => {
           setPersons(persons.filter((p) => p.id !== deletedPerson.id))
           updateInfo('Deleted', person.name)
         })
-        .catch((error) => {
+        .catch(() => {
           setErrorMessage(
             `Information of ${person.name} has already been removed from server`
           )
