@@ -3,43 +3,71 @@ import { useEffect, useState } from 'react'
 import countriesService from './service/countries'
 import weatherService from './service/weather'
 
-import Countries from './components/Countries'
+const Country = ({ country }) => {
+  const [weather, setWeather] = useState(null)
+
+  useEffect(() => {
+    const { latlng } = country
+    weatherService.getWeather(latlng[0], latlng[1]).then((weather) => {
+      setWeather(weather)
+    })
+  }, [])
+
+  if (!weather) {
+    return null
+  }
+
+  return (
+    <>
+      <h1>{country.name.common}</h1>
+      <div>capital {country.capital[0]}</div>
+      <div>area {country.area}</div>
+
+      <h2>languages:</h2>
+      <ul>
+        {Object.keys(country.languages).map((key) => (
+          <li key={key}>{country.languages[key]}</li>
+        ))}
+      </ul>
+      <img src={country.flags.png} />
+
+      <h2>Weather in {weather.name}</h2>
+      <p>temperature {weather.main.temp} Celcius</p>
+      <img src={weather.iconUrl} />
+      <p>wind {weather.wind.speed} m/s</p>
+    </>
+  )
+}
+
+const CountryList = ({ countries, onShow }) => {
+  if (countries.length > 10) {
+    return <div>Too many matches, specify another filter</div>
+  }
+
+  if (countries.length == 1) {
+    return <Country country={countries[0]} />
+  }
+
+  return countries.map((country, i) => (
+    <div key={i}>
+      {country.name.common}{' '}
+      <button onClick={() => onShow(country.name.common)}>show</button>
+    </div>
+  ))
+}
 
 function App() {
   const [findCountry, setFindCountry] = useState('')
   const [countries, setCountries] = useState([])
-  const [weather, setWeather] = useState(null)
-
-  const onShowCountry = (name) => {
-    countriesService.getByName(name).then((c) => {
-      setCountries([].concat(c))
-      setFindCountry(name)
-    })
-  }
 
   useEffect(() => {
-    if (findCountry !== '') {
-      countriesService.getAll().then((countries) => {
-        const filteredCountries = countries.filter((item) =>
-          item.name.common.toLowerCase().includes(findCountry.toLowerCase())
-        )
+    countriesService.getAll().then((countries) => setCountries(countries))
+  }, [])
 
-        console.log(filteredCountries)
-        setCountries(filteredCountries)
-      })
-    }
-  }, [findCountry])
-
-  useEffect(() => {
-    if (countries.length === 1) {
-      const { latlng } = countries[0]
-
-      weatherService.getWeather(latlng[0], latlng[1]).then((weather) => {
-        console.log(weather)
-        setWeather(weather)
-      })
-    }
-  }, [countries])
+  // Will be updated after re-render (invoke setX function)
+  const matchedCountries = countries.filter((c) =>
+    c.name.common.toLowerCase().includes(findCountry.toLowerCase())
+  )
 
   return (
     <>
@@ -50,11 +78,7 @@ function App() {
           onChange={(e) => setFindCountry(e.target.value)}
         />
       </div>
-      <Countries
-        countries={countries}
-        weather={weather}
-        onShow={onShowCountry}
-      />
+      <CountryList countries={matchedCountries} onShow={setFindCountry} />
     </>
   )
 }
