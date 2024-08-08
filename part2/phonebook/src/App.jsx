@@ -70,10 +70,9 @@ const App = () => {
         updatePerson.number = newNumber;
 
         personService.update(existingId, updatePerson).then((updatedPerson) => {
-          const newPerson = persons.map((person) =>
-            person.id !== existingId ? person : updatedPerson,
+          setPersons(
+            persons.map((p) => (p.id !== existingId ? p : updatedPerson)),
           );
-          setPersons(newPerson);
         });
       }
 

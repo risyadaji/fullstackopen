@@ -10,6 +10,10 @@
     "preview": "vite preview",
     "server": "json-server -p3001 --watch db.json"
   },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  },
   "dependencies": {
     "axios": "^1.7.3",
     "react": "^18.2.0",
