@@ -1,6 +1,5 @@
 import axios from 'axios'
-// const baseUrl = 'http://localhost:3001/notes'
-const baseUrl = 'http://localhost:3001/api/notes'
+const baseUrl = '/api/notes' // will be redirected to defined path on vite.config.js
 
 const getAll = () => {
   const request = axios.get(baseUrl)
