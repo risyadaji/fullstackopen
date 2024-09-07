@@ -1,19 +1,10 @@
 import axios from 'axios'
 
-const baseUrl = 'http://localhost:3001/persons'
+const baseUrl = '/api/persons'
 
 const getAll = () => {
   const request = axios.get(baseUrl)
   return request.then((resp) => resp.data)
-  // return request.then((resp) => {
-  //   const nonExistingPerson = {
-  //     id: '1000',
-  //     name: 'John Doe',
-  //     number: '123-442344',
-  //   }
-  //
-  //   return resp.data.concat(nonExistingPerson)
-  // })
 }
 
 const create = (newPerson) => {
