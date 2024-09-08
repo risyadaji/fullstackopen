@@ -46,8 +46,8 @@ const App = () => {
     if (window.confirm(`Delete ${person.name}?`)) {
       personService
         .deleteById(person.id)
-        .then((deletedPerson) => {
-          setPersons(persons.filter((p) => p.id !== deletedPerson.id))
+        .then((_) => {
+          setPersons(persons.filter((p) => p.id !== person.id))
           updateInfo('Deleted', person.name)
         })
         .catch(() => {

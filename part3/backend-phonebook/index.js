@@ -16,6 +16,26 @@ const sanitizeNumber = (req) => {
   }
   return JSON.stringify(body)
 }
+const errorHandler = (error, req, res, next) => {
+  console.log(error.message)
+
+  // parse error
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' })
+  }
+
+  next(error)
+}
+
+const validatePayload = (name, number) => {
+  if (!name) {
+    return { error: 'missing name' }
+  }
+  if (!number) {
+    return { error: 'missing number' }
+  }
+  return null
+}
 
 morgan.token('body', sanitizeNumber)
 
@@ -36,43 +56,54 @@ app.get('/api/persons/:id', (req, res) => {
   Person.findById(req.params.id).then((person) => res.json(person))
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const { name, number } = req.body
 
-  // validation
-  if (!name) {
-    return res.status(400).json({ error: 'missing name' })
+  let isError = validatePayload(name, number)
+  if (isError) {
+    return res.status(400).send(isError)
   }
-
-  if (!number) {
-    return res.status(400).json({ error: 'missing number' })
-  }
-
-  // todo: unique name validation
 
   const person = new Person({ name, number })
-  person.save().then((savedPerson) => res.json(savedPerson))
+  person
+    .save()
+    .then((savedPerson) => res.json(savedPerson))
+    .catch((error) => next(error))
 })
 
-app.delete('/api/persons/:id', (req, res) => {
-  const id = req.params.id
-  const person = findById(id)
+app.put('/api/persons/:id', (req, res, next) => {
+  const { name, number } = req.body
 
-  if (!person) {
-    res.status(404).end()
-  } else {
-    persons = persons.filter((person) => person.id !== id)
-    res.status(204).end()
+  let isError = validatePayload(name, number)
+  if (isError) {
+    return res.status(400).send(isError)
   }
+
+  const person = { name, number }
+  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then((updatedPerson) => res.json(updatedPerson))
+    .catch((error) => next(error))
+})
+
+app.delete('/api/persons/:id', (req, res, next) => {
+  Person.findByIdAndDelete(req.params.id)
+    .then((_) => res.status(204).end())
+    .catch((error) => next(error))
 })
 
 app.get('/info', (req, res) => {
-  let content = `
-    <p>Phonebook has info for ${persons.length} people</p>
-    <p>${Date()}</p>
-  `
-  res.send(content)
+  Person.find({})
+    .then((persons) => {
+      let content = `
+      <p>Phonebook has info for ${persons.length} people</p>
+      <p>${Date()}</p>
+     `
+      res.send(content)
+    })
+    .catch((error) => next(error))
 })
+
+app.use(errorHandler)
 
 // Server
 const PORT = process.env.PORT
