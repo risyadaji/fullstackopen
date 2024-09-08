@@ -7,12 +7,11 @@ if (process.argv.length < 3) {
 
 // Setup
 const password = process.argv[2]
-const url = `mongodb+srv://risyadaji:${password}@cluster22147.1svmk.mongodb.net/noteApp?retryWrites=true&w=majority&appName=Cluster22147`
+const uri = `mongodb+srv://risyadaji:${password}@cluster22147.1svmk.mongodb.net/noteApp?retryWrites=true&w=majority&appName=Cluster22147`
 mongoose.set('strictQuery', true)
-mongoose.connect(url)
+mongoose.connect(uri)
 
 // Schema Preparation
-// this only mandatory if we set `strictQuery` on mongodb
 const noteSchema = new mongoose.Schema({
   content: String,
   important: Boolean,
