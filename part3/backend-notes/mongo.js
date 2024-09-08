@@ -21,7 +21,7 @@ const Note = mongoose.model('Note', noteSchema)
 
 // Operation
 const note = new Note({
-  content: 'HTML is easy',
+  content: 'GET and POST are the most important methods of HTTP protocol',
   important: true,
 })
 
