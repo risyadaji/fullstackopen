@@ -30,6 +30,11 @@ const App = () => {
     setTimeout(() => setInfoMessage(null), 3000)
   }
 
+  const updateError = (message) => {
+    setErrorMessage(message)
+    setTimeout(() => setErrorMessage(null), 3000)
+  }
+
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
@@ -51,10 +56,9 @@ const App = () => {
           updateInfo('Deleted', person.name)
         })
         .catch(() => {
-          setErrorMessage(
+          updateError(
             `Information of ${person.name} has already been removed from server`
           )
-          setTimeout(() => setErrorMessage(null), 3000)
           setPersons(persons.filter((p) => p.id !== person.id))
         })
     }
@@ -86,13 +90,16 @@ const App = () => {
         const updatePerson = persons.find((person) => person.id === existingId)
         updatePerson.number = newNumber
 
-        personService.update(existingId, updatePerson).then((updatedPerson) => {
-          setPersons(
-            persons.map((p) => (p.id !== existingId ? p : updatedPerson))
-          )
+        personService
+          .update(existingId, updatePerson)
+          .then((updatedPerson) => {
+            setPersons(
+              persons.map((p) => (p.id !== existingId ? p : updatedPerson))
+            )
 
-          updateInfo('Updated', updatePerson.name)
-        })
+            updateInfo('Updated', updatePerson.name)
+          })
+          .catch((error) => updateError(error.response.data.error))
       }
 
       setNewNumber('')
@@ -105,13 +112,16 @@ const App = () => {
       number: newNumber,
     }
 
-    personService.create(newPerson).then((createdPerson) => {
-      setPersons(persons.concat(createdPerson))
-      setNewName('')
-      setNewNumber('')
+    personService
+      .create(newPerson)
+      .then((createdPerson) => {
+        setPersons(persons.concat(createdPerson))
+        setNewName('')
+        setNewNumber('')
 
-      updateInfo('Added', newPerson.name)
-    })
+        updateInfo('Added', newPerson.name)
+      })
+      .catch((error) => updateError(error.response.data.error))
   }
 
   return (

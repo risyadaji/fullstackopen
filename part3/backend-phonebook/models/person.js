@@ -10,8 +10,21 @@ mongoose
 
 // schema
 const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    required: [true, 'name required'],
+    minLength: 3,
+  },
+  number: {
+    type: String,
+    required: [true, 'phone number required'],
+    validate: {
+      validator: (v) => {
+        return /^\d{2,3}-\d{8}/.test(v)
+      },
+      message: () => `invalid phone number!`,
+    },
+  },
 })
 
 // update transform function
