@@ -23,11 +23,10 @@ const unknownEndpoint = (req, res) => {
 const errorHandler = (error, req, res, next) => {
   console.log(error.message)
 
-  switch (error.name) {
-    case 'CastError':
-      return res.status(400).send({ error: 'malformatted id' })
-    case 'ValidationError':
-      return res.status(400).send({ error: error.message })
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return res.status(400).send({ error: error.message })
   }
 
   next(error)
@@ -87,7 +86,7 @@ app.put('/api/notes/:id', (req, res, next) => {
 
 app.delete('/api/notes/:id', (req, res, next) => {
   Note.findByIdAndDelete(req.params.id)
-    .then((_) => res.status(204).end())
+    .then(() => res.status(204).end())
     .catch((error) => next(error))
 })
 
