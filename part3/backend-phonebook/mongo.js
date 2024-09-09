@@ -20,33 +20,26 @@ const personSchema = new mongoose.Schema({
 const Person = mongoose.model('Person', personSchema)
 
 // Operation
-switch (process.argv.length) {
-  case 3:
-    Person.find({}).then((persons) => {
-      console.log('phonebook:')
+if (process.argv.length === 3) {
+  Person.find({}).then((persons) => {
+    console.log('phonebook:')
 
-      persons.forEach((person) => {
-        console.log(`${person.name} ${person.number}`)
-      })
-
-      mongoose.connection.close()
+    persons.forEach((person) => {
+      console.log(`${person.name} ${person.number}`)
     })
 
-    break
+    mongoose.connection.close()
+  })
+} else if (process.argv.length === 5) {
+  const name = process.argv[3]
+  const number = process.argv[4]
 
-  case 5:
-    const name = process.argv[3]
-    const number = process.argv[4]
-
-    const person = new Person({ name, number })
-    person.save().then((result) => {
-      console.log(`added ${name} ${number} to phonebook`)
-      mongoose.connection.close()
-    })
-
-    break
-
-  default:
-    console.log('invalid arguments')
-    process.exit(1)
+  const person = new Person({ name, number })
+  person.save().then(() => {
+    console.log(`added ${name} ${number} to phonebook`)
+    mongoose.connection.close()
+  })
+} else {
+  console.log('invalid arguments')
+  process.exit(1)
 }

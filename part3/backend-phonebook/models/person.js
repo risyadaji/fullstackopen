@@ -5,7 +5,7 @@ const uri = process.env.MONGODB_URI
 mongoose.set('strictQuery', true)
 mongoose
   .connect(uri)
-  .then((_) => console.log('connected to mongoDB'))
+  .then(() => console.log('connected to mongoDB'))
   .catch((error) => console.log('error conntecting to mongoDB:', error.message))
 
 // schema
@@ -22,7 +22,7 @@ const personSchema = new mongoose.Schema({
       validator: (v) => {
         return /^\d{2,3}-\d{8}/.test(v)
       },
-      message: () => `invalid phone number!`,
+      message: () => 'invalid phone number!',
     },
   },
 })

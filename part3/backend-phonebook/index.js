@@ -11,7 +11,7 @@ const Person = require('./models/person')
 
 const sanitizeNumber = (req) => {
   let { body } = req
-  if (body.hasOwnProperty('number')) {
+  if (Object.prototype.hasOwnProperty.call(body, 'number')) {
     body['number'] = '******' // sanitize
   }
   return JSON.stringify(body)
@@ -19,11 +19,10 @@ const sanitizeNumber = (req) => {
 const errorHandler = (error, req, res, next) => {
   console.log(error.message)
 
-  switch (error.name) {
-    case 'CastError':
-      return res.status(400).send({ error: 'malformatted id' })
-    case 'ValidationError':
-      return res.status(400).send({ error: error.message })
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return res.status(400).send({ error: error.message })
   }
 
   next(error)
@@ -92,11 +91,11 @@ app.put('/api/persons/:id', (req, res, next) => {
 
 app.delete('/api/persons/:id', (req, res, next) => {
   Person.findByIdAndDelete(req.params.id)
-    .then((_) => res.status(204).end())
+    .then(() => res.status(204).end())
     .catch((error) => next(error))
 })
 
-app.get('/info', (req, res) => {
+app.get('/info', (req, res, next) => {
   Person.find({})
     .then((persons) => {
       let content = `
