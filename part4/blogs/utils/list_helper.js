@@ -1,3 +1,5 @@
+const _ = require('lodash')
+
 const dummy = (blogs) => {
   return 1
 }
@@ -35,12 +37,15 @@ const mostBlogs = (blogs) => {
       countByAuthor[blog.author] = { ...obj, blogs: obj.blogs + 1 }
     }
 
-    if (Object.keys(mostBlogs).length === 0) {
-      mostBlogs = countByAuthor[blog.author]
-    } else if (mostBlogs.blogs < countByAuthor[blog.author].blogs) {
-      mostBlogs = countByAuthor[blog.author]
-    }
+    // if (Object.keys(mostBlogs).length === 0) {
+    //   mostBlogs = countByAuthor[blog.author]
+    // } else if (mostBlogs.blogs < countByAuthor[blog.author].blogs) {
+    //   mostBlogs = countByAuthor[blog.author]
+    // }
   })
+
+  // solution with _ (lodash)
+  mostBlogs = _.maxBy(Object.values(countByAuthor), 'blogs')
 
   return mostBlogs
 }
@@ -59,12 +64,15 @@ const mostLikes = (blogs) => {
       console.log('false')
     }
 
-    if (Object.keys(mostLikes).length === 0) {
-      mostLikes = countByAuthor[blog.author]
-    } else if (mostLikes.likes < countByAuthor[blog.author].likes) {
-      mostLikes = countByAuthor[blog.author]
-    }
+    // if (Object.keys(mostLikes).length === 0) {
+    //   mostLikes = countByAuthor[blog.author]
+    // } else if (mostLikes.likes < countByAuthor[blog.author].likes) {
+    //   mostLikes = countByAuthor[blog.author]
+    // }
   })
+
+  // solution with _ (lodash)
+  mostLikes = _.maxBy(Object.values(countByAuthor), 'likes')
 
   return mostLikes
 }
