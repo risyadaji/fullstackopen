@@ -111,6 +111,35 @@ test('blog without title or url will not added', async () => {
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
 })
 
+test('update by id', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+
+  const previousBlog = blogsAtStart[0]
+  previousBlog.title = 'this title is updated'
+
+  await api
+    .put(`/api/blogs/${previousBlog.id}`)
+    .send(previousBlog)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  // console.log(blogsAtEnd[0])
+  // length not changed
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+  assert(blogsAtEnd[0].title === previousBlog.title)
+})
+
+test('delete blog by id', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+
+  const deletedBlog = blogsAtStart[0]
+  await api.delete(`/api/blogs/${deletedBlog.id}`).expect(204)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
